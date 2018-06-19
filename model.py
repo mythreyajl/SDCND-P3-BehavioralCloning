@@ -12,6 +12,47 @@ from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda
 from keras.layers import Convolution2D, MaxPooling2D
 
+def parse_data(path):
+    measurements = []
+    images = []
+    correction = 0.2
+    for root, dirs, files in os.walk(path):
+        if not files:
+            continue
+
+        if files[0].split('.')[-1] == 'csv':
+            csv_path = osp.join(root, files[0])
+            print(osp.join(root, dirs[0]))
+            with open(csv_path) as f:
+                readCSV = csv.reader(f, delimiter=',')
+                for row in readCSV:
+                    c_img_path = osp.join(root, dirs[0], row[0].split('/')[-1])
+                    l_img_path = osp.join(root, dirs[0], row[1].split('/')[-1])
+                    r_img_path = osp.join(root, dirs[0], row[2].split('/')[-1])
+                    c_img = cv2.imread(c_img_path)
+                    l_img = cv2.imread(l_img_path)
+                    r_img = cv2.imread(r_img_path)
+                    #cf_img = np.fliplr(c_img)
+                    #lf_img = np.fliplr(l_img)
+                    #rf_img = np.fliplr(r_img)
+                    c_measurement = float(row[3])
+                    l_measurement = c_measurement + correction 
+                    r_measurement = c_measurement - correction
+                    images.append(c_img)
+                    images.append(l_img)
+                    images.append(r_img)
+                    # images.append(cf_img)
+                    # images.append(lf_img)
+                    # images.append(rf_img)
+                    measurements.append(c_measurement)
+                    measurements.append(l_measurement)
+                    measurements.append(r_measurement)
+                    # measurements.append(-c_measurement)
+                    # measurements.append(-l_measurement)
+                    # measurements.append(-r_measurement)
+    return images, measurements
+
+"""
 measurements = []
 images = []
 with open('data/data_dl/driving_log_1.csv') as f:
@@ -37,12 +78,13 @@ with open('data/hilly/cw/driving_log.csv') as f:
         img = cv2.imread(img_path)
         images.append(img)
         measurements.append(float(row[3]))
-
+"""
+images, measurements = parse_data('data')
 images = np.array(images)
 measurements = np.array(measurements)
 
 X_train, X_valid, y_train, y_valid = train_test_split(images, measurements, test_size=0.2)
-
+print(len(y_train), len(y_valid))
 
 def generator(X, y, batch_size=32):
     num_samples = len(y)
