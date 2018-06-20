@@ -18,7 +18,7 @@ from sklearn.utils import shuffle
 
 def generator(samples, batch_size=6):
     num_samples = len(samples)
-    correction = 0.2
+    correction = 0.
     while 1:  # Loop forever so the generator never terminates
         shuffle(samples)
         for offset in range(0, num_samples, batch_size):
@@ -32,10 +32,10 @@ def generator(samples, batch_size=6):
                 center_angle = float(batch_sample[3])
                 name = './data/IMG/' + batch_sample[1].split('/')[-1]
                 left_image = cv2.imread(name)
-                left_angle = center_angle + 0.2
+                left_angle = center_angle + correction
                 name = './data/IMG/' + batch_sample[2].split('/')[-1]
                 right_image = cv2.imread(name)
-                right_angle = center_angle - 0.2
+                right_angle = center_angle - correction
                 images.append(center_image)
                 images.append(left_image)
                 images.append(right_image)
@@ -59,13 +59,13 @@ def generator(samples, batch_size=6):
 train_generator = generator(train_samples, batch_size=6)
 validation_generator = generator(validation_samples, batch_size=6)
 
-ch, row, col = 3, 80, 320  # Trimmed image format
+ch, row, col = 3, 60, 320  # Trimmed image format
 
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda
 from keras.layers import Convolution2D, MaxPooling2D, Cropping2D
 
-trim = [60, 20]
+trim = [80, 20]
 
 model = Sequential()
 model.add(Cropping2D(cropping=((trim[0], 0), (trim[1], 0)), input_shape=(row+trim[0]+trim[1], col, ch)))
@@ -80,7 +80,7 @@ model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit_generator(train_generator, samples_per_epoch=len(3*train_samples), validation_data=validation_generator, nb_val_samples=len(3*validation_samples), nb_epoch=3)
+model.fit_generator(train_generator, samples_per_epoch=len(6*train_samples), validation_data=validation_generator, nb_val_samples=len(6*validation_samples), nb_epoch=5)
 
 model.save('model.h5')
 
