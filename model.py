@@ -18,7 +18,7 @@ from sklearn.utils import shuffle
 
 def generator(samples, batch_size=6):
     num_samples = len(samples)
-    correction = 0.
+    correction = 0.2
     while 1:  # Loop forever so the generator never terminates
         shuffle(samples)
         for offset in range(0, num_samples, batch_size):
@@ -36,18 +36,8 @@ def generator(samples, batch_size=6):
                 name = './data/IMG/' + batch_sample[2].split('/')[-1]
                 right_image = cv2.imread(name)
                 right_angle = center_angle - correction
-                images.append(center_image)
-                images.append(left_image)
-                images.append(right_image)
-                images.append(np.fliplr(center_image))
-                images.append(np.fliplr(left_image))
-                images.append(np.fliplr(right_image))
-                angles.append(center_angle)
-                angles.append(left_angle)
-                angles.append(right_angle)
-                angles.append(-center_angle)
-                angles.append(-left_angle)
-                angles.append(-right_angle)
+                images.extend(center_image, left_image, right_image, np.fliplr(center_image), np.fliplr(left_image), np.fliplr(right_image))
+                angles.extend(center_angle, left_angle, right_angle, -center_angle, -left_angle, -right_angle)
 
             # trim image to only see section with road
             X_train = np.array(images)
