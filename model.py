@@ -18,7 +18,7 @@ from sklearn.utils import shuffle
 
 def generator(samples, batch_size=6):
     num_samples = len(samples)
-    correction = 0.2
+    correction = 0.3
     while 1:  # Loop forever so the generator never terminates
         shuffle(samples)
         for offset in range(0, num_samples, batch_size):
@@ -36,8 +36,8 @@ def generator(samples, batch_size=6):
                 name = './data/IMG/' + batch_sample[2].split('/')[-1]
                 right_image = cv2.imread(name)
                 right_angle = center_angle - correction
-                images.extend([center_image, left_image, right_image, np.fliplr(center_image), np.fliplr(left_image), np.fliplr(right_image)])
-                angles.extend([center_angle, left_angle, right_angle, -center_angle, -left_angle, -right_angle])
+                images.extend([center_image, left_image, right_image])
+                angles.extend([center_angle, left_angle, right_angle])
 
             # trim image to only see section with road
             X_train = np.array(images)
@@ -52,7 +52,7 @@ validation_generator = generator(validation_samples, batch_size=6)
 ch, row, col = 3, 60, 320  # Trimmed image format
 
 from keras.models import Sequential
-from keras.layers import Flatten, Dense, Lambda
+from keras.layers import Flatten, Dense, Lambda, Dropout
 from keras.layers import Convolution2D, MaxPooling2D, Cropping2D
 
 trim = [80, 20]
@@ -60,13 +60,21 @@ trim = [80, 20]
 model = Sequential()
 model.add(Cropping2D(cropping=((trim[0], 0), (trim[1], 0)), input_shape=(row+trim[0]+trim[1], col, ch)))
 model.add(Lambda(lambda x: x/127.5 - 1.))
-model.add(Convolution2D(6, 5, 5, activation='relu'))
+model.add(Convolution2D(10, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
-model.add(Convolution2D(16, 5, 5, activation='relu'))
+model.add(Dropout(0.5))
+model.add(Convolution2D(20, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
+model.add(Dropout(0.35))
+model.add(Convolution2D(40, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Dropout(0.25))
+model.add(Convolution2D(80, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Dropout(0.15))
 model.add(Flatten())
+model.add(Dense(200))
 model.add(Dense(120))
-model.add(Dense(84))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
