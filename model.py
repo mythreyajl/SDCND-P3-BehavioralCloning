@@ -27,17 +27,14 @@ def generator(samples, batch_size=6):
             images = []
             angles = []
             for batch_sample in batch_samples:
-                name = './data/IMG/' + batch_sample[0].split('/')[-1]
-                center_image = cv2.imread(name)
-                center_angle = float(batch_sample[3])
-                name = './data/IMG/' + batch_sample[1].split('/')[-1]
-                left_image = cv2.imread(name)
-                left_angle = center_angle + correction
-                name = './data/IMG/' + batch_sample[2].split('/')[-1]
-                right_image = cv2.imread(name)
-                right_angle = center_angle - correction
-                images.extend([center_image, left_image, right_image])
-                angles.extend([center_angle, left_angle, right_angle])
+                c_image = cv2.imread('./data/IMG/' + batch_sample[0].split('/')[-1])
+                l_image = cv2.imread('./data/IMG/' + batch_sample[1].split('/')[-1])
+                r_image = cv2.imread('./data/IMG/' + batch_sample[2].split('/')[-1])
+                c_angle = float(batch_sample[3])
+                l_angle = c_angle + correction
+                r_angle = c_angle - correction
+                images.extend([c_image, l_image, r_image, np.fliplr(c_image), np.fliplr(l_image), np.fliplr(r_image)])
+                angles.extend([c_angle, l_angle, r_angle, -c_angle, -l_angle, -r_angle])
 
             # trim image to only see section with road
             X_train = np.array(images)
@@ -60,25 +57,26 @@ trim = [80, 20]
 model = Sequential()
 model.add(Cropping2D(cropping=((trim[0], 0), (trim[1], 0)), input_shape=(row+trim[0]+trim[1], col, ch)))
 model.add(Lambda(lambda x: x/127.5 - 1.))
-model.add(Convolution2D(10, 5, 5, activation='relu'))
-model.add(MaxPooling2D())
-model.add(Dropout(0.5))
 model.add(Convolution2D(20, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
-model.add(Dropout(0.35))
+model.add(Dropout(0.5))
 model.add(Convolution2D(40, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
-model.add(Dropout(0.25))
+model.add(Dropout(0.35))
 model.add(Convolution2D(80, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Dropout(0.25))
+model.add(Convolution2D(160, 5, 5, activation='relu'))
 model.add(MaxPooling2D())
 model.add(Dropout(0.15))
 model.add(Flatten())
+model.add(Dense(400))
 model.add(Dense(200))
 model.add(Dense(120))
 model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
-model.fit_generator(train_generator, samples_per_epoch=len(6*train_samples), validation_data=validation_generator, nb_val_samples=len(6*validation_samples), nb_epoch=5)
+model.fit_generator(train_generator, samples_per_epoch=len(6*train_samples), validation_data=validation_generator, nb_val_samples=len(6*validation_samples), nb_epoch=10)
 
 model.save('model.h5')
 
