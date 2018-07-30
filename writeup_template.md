@@ -24,9 +24,9 @@ The goals / steps of this project are the following:
 [image4]: ./images/recovery2.jpg      "Recovery Image 2"
 [image5]: ./images/recovery3.jpg      "Recovery Image 3"
 [image6]: ./images/center.jpg         "Center Image"
-[image7]: ./images/left.jpg           "Left Image"
-[image8]: ./images/right.jpg          "Right Image"
-[image9]: ./images/fliplr.jpg         "Flipped Image"
+[image7]: ./images/fliplr.jpg         "Flipped Image"
+[image8]: ./images/left.jpg           "Left Image"
+[image9]: ./images/right.jpg          "Right Image"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
@@ -106,10 +106,15 @@ I then recorded the vehicle recovering from the left side and right sides of the
 
 I obtained some more data by driving on track 2 in the center lane.
 
-To augment the data set, I used the center, left and right images correspoding to one frame. There was a correction factor applied to the left and right camera to adjust the steering angle according to the Point-of-View of the left and right cameras. I also used numpy to flip the image and flip the corresponding angle(s) for center, left and right cameras. Below are sample center, left, right and center-flipped images:
+To augment the data set, I used the center, left and right images correspoding to one frame. There was a correction factor applied to the left and right camera to adjust the steering angle according to the Point-of-View of the left and right cameras. I also used numpy to flip the image and flip the corresponding angle(s) for center, left and right cameras. 
+
+Below are sample center and center-flipped images:
 
 ![alt text][image6]
 ![alt text][image7]
+
+Left and right images for the same frame:
+
 ![alt text][image8]
 ![alt text][image9]
 
