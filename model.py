@@ -51,6 +51,7 @@ ch, row, col = 3, 60, 320  # Trimmed image format
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Dropout
 from keras.layers import Convolution2D, MaxPooling2D, Cropping2D
+from keras.utils.visualize_util import plot
 
 trim = [80, 20]
 
@@ -74,6 +75,8 @@ model.add(Dense(400))
 model.add(Dense(200))
 model.add(Dense(120))
 model.add(Dense(1))
+
+plot(model, to_file='model_plot.png')
 
 model.compile(loss='mse', optimizer='adam')
 model.fit_generator(train_generator, samples_per_epoch=len(6*train_samples), validation_data=validation_generator, nb_val_samples=len(6*validation_samples), nb_epoch=10)
