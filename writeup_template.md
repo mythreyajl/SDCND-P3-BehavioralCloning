@@ -89,6 +89,7 @@ The final model architecture consisted of a cropping layer and a normalization l
 These were then flattened and followed by a series of fully connected layers with depths 400, 200, 120 and 1. The final quantity being regressed was the steering angle.
 
 Below is a visualization of the network used:
+
 ![alt text][image1]
 
 #### 3. Creation of the Training Set & Training Process
@@ -106,6 +107,7 @@ I then recorded the vehicle recovering from the left side and right sides of the
 I obtained some more data by driving on track 2 in the center lane.
 
 To augment the data set, I used the center, left and right images correspoding to one frame. There was a correction factor applied to the left and right camera to adjust the steering angle according to the Point-of-View of the left and right cameras. I also used numpy to flip the image and flip the corresponding angle(s) for center, left and right cameras. Below are sample center, left, right and center-flipped images:
+
 ![alt text][image6]
 ![alt text][image7]
 ![alt text][image8]
